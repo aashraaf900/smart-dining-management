@@ -1,0 +1,1487 @@
+const SUPABASE_URL = "https://qwzgabuupxuphvgqdmkr.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY = "b_publishable_a3tY6wrnkadyLNdhtdp9Rw_u84c-iqc";
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Smart Dining</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serfont-familykground:#f2f5f9;
+}
+
+.box{
+    width:94%;
+    max-width:950px;
+    margin:25px auto;
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 5px 20px #ccc;
+}
+
+h1,h2,h3{
+    text-align:center;
+}
+
+.subtitle{
+    text-align:center;
+    color:#777;
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    margin:8px 0 15px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:15px;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:8px;
+    background:#1769aa;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+button:disabled{
+    background:#bbb;
+    color:#666;
+    cursor:not-allowed;
+}
+
+.login-button{
+    width:100%;
+    padding:13px;
+    font-size:16px;
+}
+
+#message{
+    text-align:center;
+    color:#c0392b;
+    margin-top:12px;
+}
+
+#dashboard{
+    display:none;
+}
+
+.student-info{
+    background:#e8f1f8;
+    padding:15px;
+    border-radius:10px;
+    margin-top:20px;
+    line-height:1.9;
+}
+
+.month-navigation{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-top:25px;
+}
+
+.month-navigation button{
+    width:110px;
+}
+
+#monthName{
+    font-size:22px;
+    font-weight:bold;
+    text-align:center;
+}
+
+#monthStatus{
+    text-align:center;
+    margin-top:10px;
+    font-weight:bold;
+}
+
+#loading{
+    display:none;
+    text-align:center;
+    color:#1769aa;
+    margin-top:15px;
+}
+
+.calendar{
+    overflow-x:auto;
+    margin-top:20px;
+}
+
+table{
+    width:100%;
+    min-width:650px;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #ccc;
+    padding:8px;
+    text-align:center;
+}
+
+th{
+    background:#1769aa;
+    color:white;
+}
+
+.meal-btn{
+    width:75px;
+    background:#999;
+}
+
+.meal-btn.pending{
+    background:#f39c12;
+    color:white;
+}
+
+.meal-btn.paid{
+    background:#2e8b57;
+    color:white;
+}
+
+.meal-btn.expired{
+    background:#e74c3c;
+    color:white;
+    cursor:not-allowed;
+}
+
+.meal-btn.locked{
+    background:#ccc;
+    color:#666;
+    cursor:not-allowed;
+}
+
+.deadline-info{
+    margin-top:15px;
+    padding:12px;
+    background:#fff8df;
+    border-radius:8px;
+    font-size:13px;
+    color:#555;
+    text-align:center;
+}
+
+.account-card{
+    background:#e8f1f8;
+    padding:18px;
+    border-radius:12px;
+    margin-top:22px;
+}
+
+.account-row{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 5px;
+    border-bottom:1px solid #d2dce5;
+}
+
+.account-row:last-child{
+    border-bottom:none;
+}
+
+.green{
+    color:#2e8b57;
+    font-weight:bold;
+}
+
+.red{
+    color:#c0392b;
+    font-weight:bold;
+}
+
+.blue{
+    color:#1769aa;
+    font-weight:bold;
+}
+
+.credit-box{
+    background:#e8f7ee;
+    border:1px solid #a9d8bb;
+    padding:15px;
+    border-radius:10px;
+    margin-top:15px;
+}
+
+.credit-value{
+    font-size:24px;
+    color:#2e8b57;
+    font-weight:bold;
+    margin-top:5px;
+}
+
+.credit-info{
+    margin-top:8px;
+    font-size:13px;
+    color:#555;
+}
+
+.payment-box{
+    background:#f8f9fa;
+    border:1px solid #ddd;
+    padding:18px;
+    border-radius:12px;
+    margin-top:22px;
+}
+
+.payment-step{
+    display:none;
+    margin-top:15px;
+}
+
+.payment-step button{
+    width:100%;
+}
+
+/* PAYMENT OPTIONS */
+
+.payment-options{
+    display:flex;
+    gap:12px;
+    margin-top:15px;
+}
+
+.payment-option{
+    flex:1;
+    padding:15px;
+    border:2px solid #ccc;
+    border-radius:10px;
+    background:white;
+    color:#333;
+    text-align:center;
+    cursor:pointer;
+}
+
+.payment-option:hover{
+    border-color:#1769aa;
+}
+
+.payment-option.selected{
+    border-color:#1769aa;
+    background:#e8f1f8;
+}
+
+.payment-option small{
+    display:block;
+    margin-top:6px;
+    color:#777;
+    font-weight:normal;
+}
+
+.success{
+    color:#2e8b57;
+    font-weight:bold;
+    text-align:center;
+    margin-top:12px;
+}
+
+.error{
+    color:#c0392b;
+    font-weight:bold;
+    text-align:center;
+    margin-top:12px;
+}
+
+.demo-note{
+    background:#fff8df;
+    padding:12px;
+    border-radius:8px;
+    margin-top:15px;
+    font-size:13px;
+}
+
+.logout{
+    width:100%;
+    background:#777;
+    margin-top:20px;
+}
+
+@media(max-width:600px){
+
+    .box{
+        width:96%;
+        padding:15px;
+        margin:15px auto;
+    }
+
+    .month-navigation button{
+        width:90px;
+        padding:8px;
+    }
+
+    #monthName{
+        font-size:18px;
+    }
+
+    .payment-options{
+        flex-direction:column;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<!-- =====================================================
+                    LOGIN PAGE
+===================================================== -->
+
+<div class="box" id="loginPage">
+
+    <h1>Smart Dining</h1>
+
+    <p class="subtitle">
+        Hall Dining Management System
+    </p>
+
+    <label>Select Hall</label>
+
+    <select id="hall">
+
+        <option value="">
+            Select Hall
+        </option>
+
+        <option value="STA Hall">
+            STA Hall
+        </option>
+
+        <option value="KNI Hall">
+            KNI Hall
+        </option>
+
+        <option value="MC Hall">
+            MC Hall
+        </option>
+
+    </select>
+
+    <label>Student ID</label>
+
+    <input
+        type="text"
+        id="studentID"
+        placeholder="Enter Student ID"
+    >
+
+    <label>Password</label>
+
+    <input
+        type="password"
+        id="password"
+        placeholder="Enter Password"
+    >
+
+    <button
+        class="login-button"
+        onclick="login()">
+
+        Login
+
+    </button>
+
+    <div id="message"></div>
+
+</div>
+
+
+
+<!-- =====================================================
+                    DASHBOARD
+===================================================== -->
+
+<div class="box" id="dashboard">
+
+    <h1>Student Dashboard</h1>
+
+    <p class="subtitle">
+        Smart Dining System
+    </p>
+
+
+    <!-- STUDENT INFO -->
+
+    <div class="student-info">
+
+        <b>Name:</b>
+
+        <span id="showName">
+            -
+        </span>
+
+        <br>
+
+        <b>Student ID:</b>
+
+        <span id="showStudentID">
+            -
+        </span>
+
+        <br>
+
+        <b>Hall:</b>
+
+        <span id="showHall">
+            -
+        </span>
+
+    </div>
+
+
+
+    <!-- MONTH NAVIGATION -->
+
+    <div class="month-navigation">
+
+        <button onclick="previousMonth()">
+            ‹ Previous
+        </button>
+
+        <span id="monthName">
+            August 2026
+        </span>
+
+        <button onclick="nextMonth()">
+            Next ›
+        </button>
+
+    </div>
+
+    <div id="monthStatus"></div>
+
+    <div id="loading">
+        Loading...
+    </div>
+
+
+
+    <!-- DEADLINE -->
+
+    <div class="deadline-info">
+
+        <b>Meal Payment Deadline:</b>
+
+        Payment must be completed
+        by <b>10:00 PM on the previous night</b>.
+
+        <br><br>
+
+        🟠 Orange = Payment Pending
+        &nbsp;&nbsp;
+        🟢 Green = Paid
+        &nbsp;&nbsp;
+        🔴 Red = Deadline Passed
+
+    </div>
+
+
+
+    <!-- CALENDAR -->
+
+    <div class="calendar">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+
+                    <th>Breakfast</th>
+
+                    <th>Lunch</th>
+
+                    <th>Dinner</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="calendarBody"></tbody>
+
+        </table>
+
+    </div>
+
+
+
+    <!-- MONTH ACCOUNT -->
+
+    <div class="account-card">
+
+        <h2 id="accountMonthTitle">
+            August 2026 Account
+        </h2>
+
+        <div class="account-row">
+
+            <span>Total Meal</span>
+
+            <b id="monthMeals">
+                0
+            </b>
+
+        </div>
+
+        <div class="account-row">
+
+            <span>Total Amount</span>
+
+            <b>
+                ৳<span id="monthTotal">0</span>
+            </b>
+
+        </div>
+
+        <div class="account-row">
+
+            <span>Paid</span>
+
+            <b class="green">
+                ৳<span id="monthPaid">0</span>
+            </b>
+
+        </div>
+
+        <div class="account-row">
+
+            <span>Due</span>
+
+            <b class="red">
+                ৳<span id="monthDue">0</span>
+            </b>
+
+        </div>
+
+
+        <!-- CREDIT -->
+
+        <div class="credit-box">
+
+            <div>
+                Previous / Available Credit
+            </div>
+
+            <div class="credit-value">
+
+                ৳<span id="availableCredit">
+                    0
+                </span>
+
+            </div>
+
+            <div class="credit-info">
+
+                Credit will be deducted
+                only after payment is completed.
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+                    PAYMENT
+    ================================================= -->
+
+    <div class="payment-box">
+
+        <h2>Payment</h2>
+
+        <p>
+
+            This Month Due:
+
+            <b>
+                ৳<span id="paymentDue">
+                    0
+                </span>
+            </b>
+
+        </p>
+
+        <p>
+
+            Available Credit:
+
+            <b class="green">
+                ৳<span id="paymentCredit">
+                    0
+                </span>
+            </b>
+
+        </p>
+
+        <p>
+
+            Payable After Credit:
+
+            <b>
+                ৳<span id="payableAmount">
+                    0
+                </span>
+            </b>
+
+        </p>
+
+
+        <!-- PAYMENT OPTIONS -->
+
+        <div class="payment-options">
+
+            <button
+                type="button"
+                class="payment-option"
+                id="useCreditBtn"
+                onclick="selectPaymentOption('credit')">
+
+                💳 Use Credit
+
+                <small>
+                    Use available credit
+                </small>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="payment-option"
+                id="payAfterCreditBtn"
+                onclick="selectPaymentOption('afterCredit')">
+
+                💰 Pay After Credit
+
+                <small>
+                    Credit first, then payment
+                </small>
+
+            </button>
+
+        </div>
+
+
+
+        <!-- CREDIT CONFIRM -->
+
+        <div
+            class="payment-step"
+            id="creditPaymentInfo">
+
+            <button
+                onclick="confirmCreditPayment()">
+
+                Confirm Use Credit
+
+            </button>
+
+        </div>
+
+
+
+        <!-- PAYMENT METHOD -->
+
+        <div
+            class="payment-step"
+            id="methodStep">
+
+            <label>
+                Payment Method
+            </label>
+
+            <select id="paymentMethod">
+
+                <option value="">
+                    Select Payment Method
+                </option>
+
+                <option value="bKash">
+                    bKash
+                </option>
+
+                <option value="Nagad">
+                    Nagad
+                </option>
+
+                <option value="Rocket">
+                    Rocket
+                </option>
+
+            </select>
+
+            <button onclick="continueMethod()">
+
+                Continue
+
+            </button>
+
+        </div>
+
+
+
+        <!-- MOBILE -->
+
+        <div
+            class="payment-step"
+            id="numberStep">
+
+            <label>
+                Mobile Number
+            </label>
+
+            <input
+                type="tel"
+                id="mobileNumber"
+                placeholder="01XXXXXXXXX"
+                maxlength="11"
+            >
+
+            <button onclick="sendDemoOTP()">
+
+                Continue
+
+            </button>
+
+        </div>
+
+
+
+        <!-- OTP -->
+
+        <div
+            class="payment-step"
+            id="otpStep">
+
+            <label>
+                Demo Verification Code
+            </label>
+
+            <input
+                type="text"
+                id="demoOTP"
+                placeholder="Enter demo code"
+                maxlength="6"
+            >
+
+            <button onclick="verifyOTP()">
+
+                Verify
+
+            </button>
+
+            <div class="demo-note">
+
+                <b>DEMO MODE ONLY</b>
+
+                <br><br>
+
+                Demo Verification Code:
+                <b>123456</b>
+
+                <br><br>
+
+                Do NOT enter a real
+                payment OTP or PIN.
+
+            </div>
+
+        </div>
+
+
+        <div id="paymentMessage"></div>
+
+    </div>
+
+
+
+    <!-- LOGOUT -->
+
+    <button
+        class="logout"
+        onclick="logout()">
+
+        Logout
+
+    </button>
+
+</div>
+
+
+
+<!-- =====================================================
+                    FIREBASE
+===================================================== -->
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+/* =====================================================
+   SUPABASE CONFIG
+   Paste these 2 values from Supabase:
+   Project Settings -> API
+===================================================== */
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+const MEAL_RATE = 40;
+const FUTURE_MONTH_LIMIT = 12;
+const DEADLINE_HOUR = 22;
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+let currentStudentID = "";
+let currentHall = "";
+let currentStudentName = "";
+let currentStudentPhone = "";
+let currentDate = new Date();
+let mealData = {};
+let creditBalance = 0;
+let selectedPaymentOption = "";
+
+/* =====================================================
+   HELPERS
+===================================================== */
+async function sha256(text) {
+    const data = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hash))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+function defaultMealDay() {
+    return {
+        breakfast: { on: false, paid: false },
+        lunch: { on: false, paid: false },
+        dinner: { on: false, paid: false }
+    };
+}
+
+function normalizeMeals(data) {
+    const meals = data && typeof data === "object" ? data : {};
+    for (const date in meals) {
+        if (!meals[date]) meals[date] = defaultMealDay();
+        for (const meal of ["breakfast", "lunch", "dinner"]) {
+            if (typeof meals[date][meal] === "boolean") {
+                meals[date][meal] = {
+                    on: meals[date][meal],
+                    paid: false
+                };
+            }
+            if (!meals[date][meal]) {
+                meals[date][meal] = { on: false, paid: false };
+            }
+        }
+    }
+    return meals;
+}
+
+function studentQuery() {
+    return supabase
+        .from("students")
+        .select("*")
+        .eq("hall", currentHall)
+        .eq("student_id", currentStudentID)
+        .single();
+}
+
+/* =====================================================
+   LOGIN
+===================================================== */
+window.login = async function () {
+    const hall = document.getElementById("hall").value.trim();
+    const studentID = document.getElementById("studentID").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const message = document.getElementById("message");
+    message.innerText = "";
+
+    if (!hall) return message.innerText = "Please select your Hall.";
+    if (!studentID) return message.innerText = "Please enter Student ID.";
+    if (!password) return message.innerText = "Please enter Password.";
+
+    showLoginMessage("Checking login...");
+
+    try {
+        const { data, error } = await supabase
+            .from("students")
+            .select("*")
+            .eq("hall", hall)
+            .eq("student_id", studentID)
+            .single();
+
+        if (error) throw error;
+        if (!data) {
+            message.innerText = "Student ID not found.";
+            return;
+        }
+
+        if (data.is_blocked === true) {
+            message.innerText = "This student account is blocked.";
+            return;
+        }
+
+        const hash = await sha256(password);
+        if (String(data.password_hash || "") !== hash) {
+            message.innerText = "Wrong Student ID or Password.";
+            return;
+        }
+
+        currentStudentID = studentID;
+        currentHall = hall;
+        currentStudentName = data.name || "-";
+        currentStudentPhone = data.phone || "";
+        mealData = normalizeMeals(data.meals || {});
+        creditBalance = Number(data.credit_balance || 0);
+        currentDate = getCurrentMonth();
+
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        document.getElementById("showName").innerText = currentStudentName;
+        document.getElementById("showStudentID").innerText = data.student_id || studentID;
+        document.getElementById("showHall").innerText = data.hall || hall;
+
+        await loadData();
+    } catch (error) {
+        console.error(error);
+        message.innerText = "Login failed: " + error.message;
+    }
+};
+
+function showLoginMessage(text) {
+    document.getElementById("message").innerText = text;
+}
+
+/* =====================================================
+   LOAD / SAVE
+===================================================== */
+async function loadData() {
+    showLoading("Loading...");
+    try {
+        const { data, error } = await studentQuery();
+        if (error) throw error;
+        if (!data) throw new Error("Student data not found.");
+
+        currentStudentName = data.name || currentStudentName;
+        currentStudentPhone = data.phone || currentStudentPhone;
+        mealData = normalizeMeals(data.meals || {});
+        creditBalance = Number(data.credit_balance || 0);
+
+        document.getElementById("showName").innerText = currentStudentName;
+        document.getElementById("showStudentID").innerText = currentStudentID;
+        document.getElementById("showHall").innerText = currentHall;
+
+        renderCalendar();
+    } catch (error) {
+        console.error(error);
+        alert("Supabase error: " + error.message);
+    } finally {
+        hideLoading();
+    }
+}
+
+async function saveData() {
+    try {
+        const { error } = await supabase
+            .from("students")
+            .update({
+                name: currentStudentName,
+                phone: currentStudentPhone,
+                meals: mealData,
+                credit_balance: creditBalance
+            })
+            .eq("hall", currentHall)
+            .eq("student_id", currentStudentID);
+
+        if (error) throw error;
+    } catch (error) {
+        console.error(error);
+        alert("Could not save data: " + error.message);
+    }
+}
+
+function showLoading(text) {
+    const el = document.getElementById("loading");
+    el.innerText = text;
+    el.style.display = "block";
+}
+
+function hideLoading() {
+    document.getElementById("loading").style.display = "none";
+}
+
+/* =====================================================
+   MONTH / TIME
+===================================================== */
+function getStartOfMonth(date) {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function getCurrentMonth() {
+    return getStartOfMonth(new Date());
+}
+
+function monthName(date) {
+    return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+}
+
+function monthKey(date) {
+    return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0");
+}
+
+function getFutureMonth(number) {
+    const current = getCurrentMonth();
+    return new Date(current.getFullYear(), current.getMonth() + number, 1);
+}
+
+function getBangladeshTime() {
+    const now = new Date();
+    const bdString = now.toLocaleString("en-US", { timeZone: "Asia/Dhaka" });
+    return new Date(bdString);
+}
+
+function getMealDeadline(dateKey) {
+    const parts = dateKey.split("-");
+    return new Date(
+        Number(parts[0]),
+        Number(parts[1]) - 1,
+        Number(parts[2]) - 1,
+        DEADLINE_HOUR, 0, 0, 0
+    );
+}
+
+function isDeadlinePassed(dateKey) {
+    return getBangladeshTime() >= getMealDeadline(dateKey);
+}
+
+function canEditMonth() {
+    const current = getCurrentMonth();
+    const next = getFutureMonth(1);
+    const selected = getStartOfMonth(currentDate);
+    return selected.getTime() === current.getTime() ||
+           selected.getTime() === next.getTime();
+}
+
+function getMealStatus(item, dateKey) {
+    if (item.on && item.paid) return "paid";
+    if (item.on && !item.paid && !isDeadlinePassed(dateKey)) return "pending";
+    if (item.on && !item.paid && isDeadlinePassed(dateKey)) return "expired";
+    return "off";
+}
+
+/* =====================================================
+   CALENDAR
+===================================================== */
+function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    document.getElementById("monthName").innerText = monthName(currentDate);
+    document.getElementById("accountMonthTitle").innerText = monthName(currentDate) + " Account";
+
+    const current = getCurrentMonth();
+    const selected = getStartOfMonth(currentDate);
+    const difference =
+        (selected.getFullYear() - current.getFullYear()) * 12 +
+        (selected.getMonth() - current.getMonth());
+
+    const status = document.getElementById("monthStatus");
+    if (difference < 0) {
+        status.innerText = "Previous Month — View Only";
+        status.style.color = "#777";
+    } else if (difference === 0) {
+        status.innerText = "Current Month — Editable";
+        status.style.color = "#2e8b57";
+    } else if (difference === 1) {
+        status.innerText = "Next Month — Editable";
+        status.style.color = "#1769aa";
+    } else {
+        status.innerText = "Future Month — View Only";
+        status.style.color = "#777";
+    }
+
+    const days = new Date(year, month + 1, 0).getDate();
+    const tbody = document.getElementById("calendarBody");
+    tbody.innerHTML = "";
+
+    for (let day = 1; day <= days; day++) {
+        const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        if (!mealData[key]) mealData[key] = defaultMealDay();
+
+        const row = document.createElement("tr");
+        const dateCell = document.createElement("td");
+        dateCell.innerText = day;
+        row.appendChild(dateCell);
+        row.appendChild(createMealCell(key, "breakfast"));
+        row.appendChild(createMealCell(key, "lunch"));
+        row.appendChild(createMealCell(key, "dinner"));
+        tbody.appendChild(row);
+    }
+
+    updateMonthAccount();
+}
+
+function createMealCell(key, meal) {
+    const cell = document.createElement("td");
+    const button = document.createElement("button");
+    button.className = "meal-btn";
+    const item = mealData[key][meal];
+    const status = getMealStatus(item, key);
+
+    if (status === "paid") {
+        button.innerText = "ON";
+        button.classList.add("paid");
+    } else if (status === "pending") {
+        button.innerText = "ON";
+        button.classList.add("pending");
+        button.title = "Payment pending";
+    } else if (status === "expired") {
+        button.innerText = "OFF";
+        button.classList.add("expired");
+        button.disabled = true;
+        button.title = "Payment deadline passed";
+    } else {
+        button.innerText = "OFF";
+    }
+
+    if (!canEditMonth()) {
+        button.disabled = true;
+        button.classList.add("locked");
+    }
+
+    if (canEditMonth() && isDeadlinePassed(key) && !item.paid) {
+        button.disabled = true;
+        button.classList.remove("pending");
+        button.classList.add("expired");
+        button.innerText = "OFF";
+    }
+
+    button.onclick = async () => await toggleMeal(key, meal, button);
+    cell.appendChild(button);
+    return cell;
+}
+
+async function toggleMeal(key, meal, button) {
+    if (!canEditMonth()) return;
+    if (isDeadlinePassed(key)) {
+        showPaymentError("Payment deadline has passed for this meal.");
+        return;
+    }
+
+    const item = mealData[key][meal];
+
+    if (item.on) {
+        if (item.paid) creditBalance += MEAL_RATE;
+        item.on = false;
+        item.paid = false;
+        button.innerText = "OFF";
+        button.classList.remove("pending", "paid", "expired");
+        button.classList.add("meal-btn");
+    } else {
+        item.on = true;
+        item.paid = false;
+        button.innerText = "ON";
+        button.classList.remove("expired", "paid");
+        button.classList.add("pending");
+    }
+
+    updateMonthAccount();
+    await saveData();
+}
+
+function getMonthAccount(key) {
+    let totalMeals = 0, totalAmount = 0, paid = 0, due = 0;
+
+    for (const date in mealData) {
+        if (!date.startsWith(key)) continue;
+
+        for (const meal of ["breakfast", "lunch", "dinner"]) {
+            const item = mealData[date][meal];
+            if (!item || !item.on) continue;
+            if (!item.paid && isDeadlinePassed(date)) continue;
+
+            totalMeals++;
+            totalAmount += MEAL_RATE;
+            if (item.paid) paid += MEAL_RATE;
+            else due += MEAL_RATE;
+        }
+    }
+
+    return { totalMeals, totalAmount, paid, due };
+}
+
+function updateMonthAccount() {
+    const key = monthKey(currentDate);
+    const account = getMonthAccount(key);
+
+    document.getElementById("monthMeals").innerText = account.totalMeals;
+    document.getElementById("monthTotal").innerText = account.totalAmount;
+    document.getElementById("monthPaid").innerText = account.paid;
+    document.getElementById("monthDue").innerText = account.due;
+    document.getElementById("availableCredit").innerText = creditBalance;
+    document.getElementById("paymentDue").innerText = account.due;
+    document.getElementById("paymentCredit").innerText = creditBalance;
+
+    const creditUsed = Math.min(creditBalance, account.due);
+    document.getElementById("payableAmount").innerText = account.due - creditUsed;
+}
+
+window.previousMonth = function () {
+    const current = getCurrentMonth();
+    const selected = getStartOfMonth(currentDate);
+    const minimum = new Date(current.getFullYear(), current.getMonth() - 1, 1);
+    if (selected.getTime() <= minimum.getTime()) return;
+
+    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+    resetPaymentUI();
+    renderCalendar();
+};
+
+window.nextMonth = function () {
+    const selected = getStartOfMonth(currentDate);
+    const current = getCurrentMonth();
+    const maximum = new Date(current.getFullYear(), current.getMonth() + FUTURE_MONTH_LIMIT, 1);
+    if (selected.getTime() >= maximum.getTime()) return;
+
+    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+    resetPaymentUI();
+    renderCalendar();
+};
+
+/* =====================================================
+   PAYMENT
+===================================================== */
+window.selectPaymentOption = function (option) {
+    const account = getMonthAccount(monthKey(currentDate));
+    if (account.due <= 0) {
+        showPaymentError("This month has no due.");
+        return;
+    }
+
+    resetPaymentSteps();
+    selectedPaymentOption = option;
+    document.getElementById("useCreditBtn").classList.remove("selected");
+    document.getElementById("payAfterCreditBtn").classList.remove("selected");
+
+    if (option === "credit") {
+        document.getElementById("useCreditBtn").classList.add("selected");
+
+        if (creditBalance <= 0) {
+            showPaymentError("No available credit.");
+            return;
+        }
+
+        const creditUsed = Math.min(
+            Math.floor(creditBalance / MEAL_RATE) * MEAL_RATE,
+            account.due
+        );
+        const remaining = account.due - creditUsed;
+
+        document.getElementById("creditPaymentInfo").style.display = "block";
+
+        if (remaining <= 0) {
+            showPaymentSuccess(`Credit ৳${creditUsed} will cover the full due. Click Confirm Use Credit.`);
+        } else {
+            showPaymentError(`Credit is not enough for the full due. Use Pay After Credit for remaining ৳${remaining}.`);
+        }
+        return;
+    }
+
+    if (option === "afterCredit") {
+        document.getElementById("payAfterCreditBtn").classList.add("selected");
+
+        const creditUsed = Math.min(
+            Math.floor(creditBalance / MEAL_RATE) * MEAL_RATE,
+            account.due
+        );
+        const remaining = account.due - creditUsed;
+
+        if (remaining <= 0) {
+            document.getElementById("creditPaymentInfo").style.display = "block";
+            showPaymentSuccess(`Credit ৳${creditUsed} covers the full due. You can confirm Credit payment.`);
+            return;
+        }
+
+        document.getElementById("methodStep").style.display = "block";
+        showPaymentSuccess(`Credit ৳${creditUsed} will be used first. Remaining payment: ৳${remaining}`);
+    }
+};
+
+window.confirmCreditPayment = async function () {
+    const key = monthKey(currentDate);
+    const account = getMonthAccount(key);
+
+    if (account.due <= 0) return showPaymentError("No payment due.");
+    if (creditBalance < account.due) {
+        return showPaymentError("Credit is not enough for the full payment. Please select Pay After Credit.");
+    }
+
+    const creditUsed = account.due;
+    creditBalance -= creditUsed;
+    markMonthDueAsPaid(key);
+    await saveData();
+    updateMonthAccount();
+    renderCalendar();
+    resetPaymentUI();
+
+    showPaymentSuccess(`Payment Successful ✓ | Credit Used: ৳${creditUsed}`);
+};
+
+function markMonthDueAsPaid(key) {
+    for (const date in mealData) {
+        if (!date.startsWith(key)) continue;
+
+        for (const meal of ["breakfast", "lunch", "dinner"]) {
+            const item = mealData[date][meal];
+            if (item && item.on && !item.paid && !isDeadlinePassed(date)) {
+                item.paid = true;
+            }
+        }
+    }
+}
+
+window.continueMethod = function () {
+    if (selectedPaymentOption !== "afterCredit") {
+        return showPaymentError("Please select Pay After Credit.");
+    }
+
+    const method = document.getElementById("paymentMethod").value;
+    if (!method) return showPaymentError("Please select a payment method.");
+
+    document.getElementById("numberStep").style.display = "block";
+};
+
+window.sendDemoOTP = function () {
+    const number = document.getElementById("mobileNumber").value.trim();
+    if (number.length !== 11 || !number.startsWith("01")) {
+        return showPaymentError("Enter a valid 11-digit demo number.");
+    }
+
+    document.getElementById("otpStep").style.display = "block";
+    showPaymentSuccess("Demo verification code sent.");
+};
+
+window.verifyOTP = async function () {
+    const otp = document.getElementById("demoOTP").value.trim();
+    if (otp !== "123456") return showPaymentError("Wrong demo verification code.");
+
+    const key = monthKey(currentDate);
+    const account = getMonthAccount(key);
+    if (account.due <= 0) return showPaymentError("No payment due.");
+
+    const creditUsed = Math.min(
+        Math.floor(creditBalance / MEAL_RATE) * MEAL_RATE,
+        account.due
+    );
+    const remaining = account.due - creditUsed;
+
+    creditBalance -= creditUsed;
+    markMonthDueAsPaid(key);
+    await saveData();
+
+    updateMonthAccount();
+    renderCalendar();
+    resetPaymentUI();
+
+    if (creditUsed > 0) {
+        showPaymentSuccess(`Payment Successful ✓ | Credit Used: ৳${creditUsed} | Paid by ${document.getElementById("paymentMethod").value}: ৳${remaining}`);
+    } else {
+        showPaymentSuccess("Payment Successful ✓");
+    }
+};
+
+function resetPaymentSteps() {
+    document.getElementById("creditPaymentInfo").style.display = "none";
+    document.getElementById("methodStep").style.display = "none";
+    document.getElementById("numberStep").style.display = "none";
+    document.getElementById("otpStep").style.display = "none";
+}
+
+function resetPaymentUI() {
+    selectedPaymentOption = "";
+    resetPaymentSteps();
+    document.getElementById("useCreditBtn").classList.remove("selected");
+    document.getElementById("payAfterCreditBtn").classList.remove("selected");
+    document.getElementById("paymentMethod").value = "";
+    document.getElementById("mobileNumber").value = "";
+    document.getElementById("demoOTP").value = "";
+    document.getElementById("paymentMessage").innerText = "";
+}
+
+function showPaymentSuccess(text) {
+    const el = document.getElementById("paymentMessage");
+    el.innerText = text;
+    el.className = "success";
+}
+
+function showPaymentError(text) {
+    const el = document.getElementById("paymentMessage");
+    el.innerText = text;
+    el.className = "error";
+}
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+window.logout = function () {
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("loginPage").style.display = "block";
+
+    document.getElementById("studentID").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("hall").value = "";
+    document.getElementById("message").innerText = "";
+    document.getElementById("paymentMessage").innerText = "";
+
+    currentStudentID = "";
+    currentHall = "";
+    currentStudentName = "";
+    currentStudentPhone = "";
+    mealData = {};
+    creditBalance = 0;
+    selectedPaymentOption = "";
+};
+</script>
+
+</body>
+
+</html>
